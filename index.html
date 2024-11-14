@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tune Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555555;
+        }
+
+        .input-group input {
+            padding: 10px;
+            border: 2px solid #dddddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #4A90E2;
+            outline: none;
+        }
+
+        .button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #4A90E2;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .button:hover {
+            background-color: #357ABD;
+        }
+
+        .error {
+            color: #D8000C;
+            background-color: #FFBABA;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            padding: 5px;
+            text-align: left;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333333;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* New Styles for Commands Section */
+        .commands-section {
+            margin-top: 30px;
+        }
+
+        .commands-section label {
+            font-weight: bold;
+            color: #555555;
+            margin-bottom: 8px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .commands-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .commands-box textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 2px solid #dddddd;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f9f9f9;
+        }
+
+        .copy-button {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            padding: 8px 12px;
+            background-color: #4A90E2;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .copy-button:hover {
+            background-color: #357ABD;
+        }
+
+        .copy-button:active {
+            background-color: #2a5f99;
+        }
+
+        .copy-feedback {
+            position: absolute;
+            right: 10px;
+            top: 50px;
+            background-color: #4BB543;
+            color: #ffffff;
+            padding: 8px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .button {
+                font-size: 16px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+
+            .copy-button {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .copy-feedback {
+                top: 45px;
+                right: 10px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tune Calculator</h1>
+        <div class="input-group">
+            <label for="scale">Enter Scale Value:</label>
+            <input type="number" id="scale" placeholder="e.g., 1.0" step="0.01" min="0.01">
+        </div>
+        <button class="button" onclick="calculateTunes()">Calculate</button>
+        <div class="error" id="error">Please enter a valid scale value greater than 0.</div>
+        <div id="results"></div>
+
+        <div class="commands-section" id="commands-section" style="display: none;">
+            <label for="commands">Copyable Tune Command:</label>
+            <div class="commands-box">
+                <textarea id="commands" readonly></textarea>
+                <button class="copy-button" onclick="copyCommands()">Copy</button>
+                <div class="copy-feedback" id="copy-feedback">Copied!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class Tunes {
+            constructor(ground_control_speed, ground_control_accel, ground_friction, ground_jump_impulse,
+                air_jump_impulse, air_control_speed, air_control_accel, air_friction,
+                hook_fire_speed, hook_drag_accel, hook_drag_speed, gravity,
+                velramp_start, velramp_range, gun_speed, gun_lifetime,
+                grenade_speed, grenade_lifetime, laser_bounce_delay, jetpack_strength,
+                shotgun_strength, explosion_strength, hammer_strength, hook_duration,
+                hammer_fire_delay, gun_fire_delay, shotgun_fire_delay, grenade_fire_delay,
+                laser_fire_delay, ninja_fire_delay, hammer_hit_fire_delay) {
+                this.ground_control_speed = ground_control_speed;
+                this.ground_control_accel = ground_control_accel;
+                this.ground_friction = ground_friction;
+                this.ground_jump_impulse = ground_jump_impulse;
+                this.air_jump_impulse = air_jump_impulse;
+                this.air_control_speed = air_control_speed;
+                this.air_control_accel = air_control_accel;
+                this.air_friction = air_friction;
+                this.hook_fire_speed = hook_fire_speed;
+                this.hook_drag_accel = hook_drag_accel;
+                this.hook_drag_speed = hook_drag_speed;
+                this.gravity = gravity;
+                this.velramp_start = velramp_start;
+                this.velramp_range = velramp_range;
+                this.gun_speed = gun_speed;
+                this.gun_lifetime = gun_lifetime;
+                this.grenade_speed = grenade_speed;
+                this.grenade_lifetime = grenade_lifetime;
+                this.laser_bounce_delay = laser_bounce_delay;
+                this.jetpack_strength = jetpack_strength;
+                this.shotgun_strength = shotgun_strength;
+                this.explosion_strength = explosion_strength;
+                this.hammer_strength = hammer_strength;
+                this.hook_duration = hook_duration;
+                this.hammer_fire_delay = hammer_fire_delay;
+                this.gun_fire_delay = gun_fire_delay;
+                this.shotgun_fire_delay = shotgun_fire_delay;
+                this.grenade_fire_delay = grenade_fire_delay;
+                this.laser_fire_delay = laser_fire_delay;
+                this.ninja_fire_delay = ninja_fire_delay;
+                this.hammer_hit_fire_delay = hammer_hit_fire_delay;
+            }
+        }
+
+        const decimalPrecision = {
+            ground_control_speed: 0,
+            ground_control_accel: 1,
+            ground_friction: 8,
+            ground_jump_impulse: 1,
+            air_jump_impulse: 0,
+            air_control_speed: 1,
+            air_control_accel: 3,
+            air_friction: 7,
+            hook_fire_speed: 0,
+            hook_drag_accel: 2,
+            hook_drag_speed: 1,
+            gravity: 3,
+            velramp_start: 0,
+            velramp_range: 0,
+            gun_speed: 0,
+            gun_lifetime: 0,
+            grenade_speed: 0,
+            grenade_lifetime: 0,
+            laser_bounce_delay: 0,
+            jetpack_strength: 0,
+            shotgun_strength: 0,
+            explosion_strength: 0,
+            hammer_strength: 1,
+            hook_duration: 3,
+            hammer_fire_delay: 1,
+            gun_fire_delay: 1,
+            shotgun_fire_delay: 0,
+            grenade_fire_delay: 0,
+            laser_fire_delay: 0,
+            ninja_fire_delay: 0,
+            hammer_hit_fire_delay: 0
+        };
+
+        function physics_scaling_linear(value, tick_speed) {
+            return value / (tick_speed / 50.0);
+        }
+
+        function physics_scaling_accel(value, tick_speed) {
+            return value / Math.pow(tick_speed / 50.0, 2);
+        }
+
+        function physics_scaling_friction(value, tick_speed) {
+            return Math.pow(value, 1.0 / (tick_speed / 50.0));
+        }
+
+        function computeTunes(tick_speed) {
+            return new Tunes(
+                physics_scaling_linear(10.0, tick_speed),
+                physics_scaling_accel(2.0, tick_speed),
+                physics_scaling_friction(0.5, tick_speed),
+                physics_scaling_linear(13.2, tick_speed),
+                physics_scaling_linear(12.0, tick_speed),
+                physics_scaling_linear(5.0, tick_speed),
+                physics_scaling_accel(1.5, tick_speed),
+                physics_scaling_friction(0.95, tick_speed),
+                physics_scaling_linear(80.0, tick_speed),
+                physics_scaling_accel(3.0, tick_speed),
+                physics_scaling_linear(15.0, tick_speed),
+                physics_scaling_accel(0.5, tick_speed),
+                physics_scaling_linear(550.0, tick_speed),
+                physics_scaling_linear(2000.0, tick_speed),
+                physics_scaling_linear(2200.0, tick_speed),
+                physics_scaling_linear(2.0, tick_speed),
+                physics_scaling_linear(1000.0, tick_speed),
+                physics_scaling_linear(2.0, tick_speed),
+                physics_scaling_linear(150.0, tick_speed),
+                physics_scaling_linear(400.0, tick_speed),
+                physics_scaling_linear(10.0, tick_speed),
+                physics_scaling_linear(6.0, tick_speed),
+                physics_scaling_linear(1.0, tick_speed),
+                physics_scaling_linear(1.25, tick_speed),
+                physics_scaling_linear(125.0, tick_speed),
+                physics_scaling_linear(125.0, tick_speed),
+                physics_scaling_linear(500.0, tick_speed),
+                physics_scaling_linear(500.0, tick_speed),
+                physics_scaling_linear(800.0, tick_speed),
+                physics_scaling_linear(800.0, tick_speed),
+                physics_scaling_linear(320.0, tick_speed)
+            );
+        }
+
+        function calculateTunesHandler(scale) {
+            const tick_speed = Math.round((1.0 / scale) * 50.0);
+            const new_tunes = computeTunes(tick_speed);
+            return new_tunes;
+        }
+
+        function displayResults(tunes) {
+            const resultsDiv = document.getElementById('results');
+            const table = document.createElement('table');
+
+            const header = table.insertRow();
+            const th1 = document.createElement('th');
+            th1.innerText = 'Parameter';
+            const th2 = document.createElement('th');
+            th2.innerText = 'Value';
+            header.appendChild(th1);
+            header.appendChild(th2);
+
+            for (const [key, value] of Object.entries(tunes)) {
+                const row = table.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                cell1.innerText = formatKey(key);
+                const decimals = decimalPrecision[key] !== undefined ? decimalPrecision[key] : 4;
+                cell2.innerText = formatNumber(value, decimals);
+            }
+
+            resultsDiv.innerHTML = '';
+            resultsDiv.appendChild(table);
+        }
+
+        function formatKey(key) {
+            return key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+        }
+
+        function formatNumber(value, decimals) {
+            return parseFloat(value.toFixed(decimals)).toString();
+        }
+
+        function generateTuneCommands(tunes) {
+            let commands = '';
+            for (const [key, value] of Object.entries(tunes)) {
+                const decimals = decimalPrecision[key] !== undefined ? decimalPrecision[key] : 4;
+                const formattedValue = formatNumber(value, decimals);
+                commands += `tune ${key} ${formattedValue};`;
+            }
+            commands += '';
+            return commands.trim();
+        }
+
+        function displayCommands(commands) {
+            const commandsSection = document.getElementById('commands-section');
+            const commandsTextarea = document.getElementById('commands');
+            commandsTextarea.value = commands;
+            commandsSection.style.display = 'block';
+        }
+
+        function calculateTunes() {
+            const scaleInput = document.getElementById('scale').value;
+            const errorDiv = document.getElementById('error');
+            const resultsDiv = document.getElementById('results');
+            const commandsSection = document.getElementById('commands-section');
+
+            const scale = parseFloat(scaleInput);
+            if (isNaN(scale) || scale <= 0) {
+                errorDiv.style.display = 'block';
+                resultsDiv.innerHTML = '';
+                commandsSection.style.display = 'none';
+                return;
+            } else {
+                errorDiv.style.display = 'none';
+            }
+
+            const tunes = calculateTunesHandler(scale);
+
+            displayResults(tunes);
+
+            const commands = generateTuneCommands(tunes);
+            displayCommands(commands);
+        }
+
+        function copyCommands() {
+            const commandsTextarea = document.getElementById('commands');
+            commandsTextarea.select();
+            commandsTextarea.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopyFeedback();
+                } else {
+                    alert('Unable to copy. Please try manually.');
+                }
+            } catch (err) {
+                alert('Browser does not support copy functionality.');
+            }
+        }
+
+        function showCopyFeedback() {
+            const feedback = document.getElementById('copy-feedback');
+            feedback.style.display = 'block';
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 2000);
+        }
+
+        document.getElementById('scale').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                calculateTunes();
+            }
+        });
+    </script>
+</body>
+
+</html>
