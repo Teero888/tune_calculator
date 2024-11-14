@@ -2,6 +2,8 @@ A simple calculator for physics tunes in ddnet to make the game seem slower or f
 Even though it works very well most of the time, due to ddnet rounding physics values this won't work well if the scale is too extreme.
 Currently there is no good way to apply these tunes to your map except putting them in manually.
 
+If you just want some tunes go to https://teero888.github.io/tune_calculator/
+
 `usage: tune_calculator <scale>`
 scale 0.5 would be equivalent to a 2x slow down.
 
