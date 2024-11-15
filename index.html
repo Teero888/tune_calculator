@@ -317,6 +317,10 @@
             hammer_hit_fire_delay: 0
         };
 
+        function physics_scaling_linear_invert(value, tick_speed) {
+            return value * (tick_speed / 50.0);
+        }
+
         function physics_scaling_linear(value, tick_speed) {
             return value / (tick_speed / 50.0);
         }
@@ -346,22 +350,22 @@
                 physics_scaling_linear(550.0, tick_speed),
                 physics_scaling_linear(2000.0, tick_speed),
                 physics_scaling_linear(2200.0, tick_speed),
-                physics_scaling_linear(2.0, tick_speed),
+                physics_scaling_linear_invert(2.0, tick_speed),
                 physics_scaling_linear(1000.0, tick_speed),
-                physics_scaling_linear(2.0, tick_speed),
-                physics_scaling_linear(150.0, tick_speed),
+                physics_scaling_linear_invert(2.0, tick_speed),
+                physics_scaling_linear_invert(150.0, tick_speed),
                 physics_scaling_linear(400.0, tick_speed),
                 physics_scaling_linear(10.0, tick_speed),
                 physics_scaling_linear(6.0, tick_speed),
                 physics_scaling_linear(1.0, tick_speed),
-                physics_scaling_linear(1.25, tick_speed),
-                physics_scaling_linear(125.0, tick_speed),
-                physics_scaling_linear(125.0, tick_speed),
-                physics_scaling_linear(500.0, tick_speed),
-                physics_scaling_linear(500.0, tick_speed),
-                physics_scaling_linear(800.0, tick_speed),
-                physics_scaling_linear(800.0, tick_speed),
-                physics_scaling_linear(320.0, tick_speed)
+                physics_scaling_linear_invert(1.25, tick_speed),
+                physics_scaling_linear_invert(125.0, tick_speed),
+                physics_scaling_linear_invert(125.0, tick_speed),
+                physics_scaling_linear_invert(500.0, tick_speed),
+                physics_scaling_linear_invert(500.0, tick_speed),
+                physics_scaling_linear_invert(800.0, tick_speed),
+                physics_scaling_linear_invert(800.0, tick_speed),
+                physics_scaling_linear_invert(320.0, tick_speed)
             );
         }
 
@@ -388,8 +392,7 @@
                 const cell1 = row.insertCell(0);
                 const cell2 = row.insertCell(1);
                 cell1.innerText = formatKey(key);
-                const decimals = decimalPrecision[key] !== undefined ? decimalPrecision[key] : 4;
-                cell2.innerText = formatNumber(value, decimals);
+                cell2.innerText = value;
             }
 
             resultsDiv.innerHTML = '';
@@ -400,16 +403,11 @@
             return key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
         }
 
-        function formatNumber(value, decimals) {
-            return parseFloat(value.toFixed(decimals)).toString();
-        }
-
         function generateTuneCommands(tunes) {
             let commands = '';
             for (const [key, value] of Object.entries(tunes)) {
                 const decimals = decimalPrecision[key] !== undefined ? decimalPrecision[key] : 4;
-                const formattedValue = formatNumber(value, decimals);
-                commands += `tune ${key} ${formattedValue};`;
+                commands += `tune ${key} ${value};`;
             }
             commands += '';
             return commands.trim();

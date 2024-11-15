@@ -34,6 +34,10 @@ struct Tunes {
     hammer_hit_fire_delay: f32,
 }
 
+fn physics_scaling_linear_invert(value: f32, tick_speed: i32) -> f32 {
+    value * { tick_speed as f32 / 50.0 }
+}
+
 fn physics_scaling_linear(value: f32, tick_speed: i32) -> f32 {
     value / { tick_speed as f32 / 50.0 }
 }
@@ -63,22 +67,22 @@ fn calculate_tunes(tick_speed: i32) -> Tunes {
         velramp_start: physics_scaling_linear(550.0, tick_speed),
         velramp_range: physics_scaling_linear(2000.0, tick_speed),
         gun_speed: physics_scaling_linear(2200.0, tick_speed),
-        gun_lifetime: physics_scaling_linear(2.0, tick_speed),
+        gun_lifetime: physics_scaling_linear_invert(2.0, tick_speed),
         grenade_speed: physics_scaling_linear(1000.0, tick_speed),
-        grenade_lifetime: physics_scaling_linear(2.0, tick_speed),
-        laser_bounce_delay: physics_scaling_linear(150.0, tick_speed),
+        grenade_lifetime: physics_scaling_linear_invert(2.0, tick_speed),
+        laser_bounce_delay: physics_scaling_linear_invert(150.0, tick_speed),
         jetpack_strength: physics_scaling_linear(400.0, tick_speed),
         shotgun_strength: physics_scaling_linear(10.0, tick_speed),
         explosion_strength: physics_scaling_linear(6.0, tick_speed),
         hammer_strength: physics_scaling_linear(1.0, tick_speed),
-        hook_duration: physics_scaling_linear(1.25, tick_speed),
-        hammer_fire_delay: physics_scaling_linear(125.0, tick_speed),
-        gun_fire_delay: physics_scaling_linear(125.0, tick_speed),
-        shotgun_fire_delay: physics_scaling_linear(500.0, tick_speed),
-        grenade_fire_delay: physics_scaling_linear(500.0, tick_speed),
-        laser_fire_delay: physics_scaling_linear(800.0, tick_speed),
-        ninja_fire_delay: physics_scaling_linear(800.0, tick_speed),
-        hammer_hit_fire_delay: physics_scaling_linear(320.0, tick_speed),
+        hook_duration: physics_scaling_linear_invert(1.25, tick_speed),
+        hammer_fire_delay: physics_scaling_linear_invert(125.0, tick_speed),
+        gun_fire_delay: physics_scaling_linear_invert(125.0, tick_speed),
+        shotgun_fire_delay: physics_scaling_linear_invert(500.0, tick_speed),
+        grenade_fire_delay: physics_scaling_linear_invert(500.0, tick_speed),
+        laser_fire_delay: physics_scaling_linear_invert(800.0, tick_speed),
+        ninja_fire_delay: physics_scaling_linear_invert(800.0, tick_speed),
+        hammer_hit_fire_delay: physics_scaling_linear_invert(320.0, tick_speed),
     }
 }
 
