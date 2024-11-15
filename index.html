@@ -392,7 +392,8 @@
                 const cell1 = row.insertCell(0);
                 const cell2 = row.insertCell(1);
                 cell1.innerText = formatKey(key);
-                cell2.innerText = value;
+                let rounded = value.toFixed(2);
+                cell2.innerText = rounded;
             }
 
             resultsDiv.innerHTML = '';
@@ -406,8 +407,8 @@
         function generateTuneCommands(tunes) {
             let commands = '';
             for (const [key, value] of Object.entries(tunes)) {
-                const decimals = decimalPrecision[key] !== undefined ? decimalPrecision[key] : 4;
-                commands += `tune ${key} ${value};`;
+                let rounded = value.toFixed(2);
+                commands += `tune ${key} ${rounded};`;
             }
             commands += '';
             return commands.trim();
